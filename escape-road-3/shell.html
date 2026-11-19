@@ -4219,7 +4219,7 @@ function createUnityInstance(t, n, l) {
 			dataUrl: URL.createObjectURL(new Blob([bufs[0], bufs[1]], { type: "application/octet-stream" })),
 			frameworkUrl: URL.createObjectURL(new Blob([bufs[3]], { type: "application/javascript" })),
 			codeUrl: URL.createObjectURL(new Blob([bufs[2]], { type: "application/wasm" })),
-			streamingAssetsUrl: "StreamingAssets",
+			streamingAssetsUrl: BASE + "StreamingAssets/",
 			companyName: "ozgames.io",
 			productName: "Escape Road 3",
 			productVersion: "26041006",
