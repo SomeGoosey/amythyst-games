@@ -4195,7 +4195,7 @@ function createUnityInstance(t, n, l) {
 
 	// Game payload lives on jsDelivr as four raw gzip files (no base64 wrapper).
 	// They are Unity's own compressed packages; Unity inflates them itself.
-	var BASE = "__BASE__";
+	var BASE = "https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@9a9bcb11082cfb92a31ea14f110726eae699a232/escape-road-3/";
 	var FILES = ["data.0.bin", "data.1.bin", "wasm.bin", "framework.bin"];
 
 	function fetchBytes(name) {
