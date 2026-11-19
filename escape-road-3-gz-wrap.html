@@ -43,7 +43,7 @@
         document.getElementById('status').textContent = 'Error: ' + (e && e.message || e);
       }
     }
-    load();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
   </script>
   <iframe id="frame" title="Escape Road 3" allow="fullscreen; gamepad; pointer-lock"></iframe>
 </body>
