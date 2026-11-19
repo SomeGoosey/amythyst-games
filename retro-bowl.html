@@ -114,7 +114,7 @@
   };
   // XHR.open
   var open = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function (m, u) { return open.call(this, m, map(u)); };
+  XMLHttpRequest.prototype.open = function () { var a = Array.prototype.slice.call(arguments); var k = String(a[1]).split('?')[0].split('#')[0].split('/').pop(); if (URLS[k]) { window.__assetHits.push(k); a[1] = (String(a[0]).toUpperCase() === 'HEAD') ? 'data:text/plain,' : URLS[k]; } return open.apply(this, a); };
   // Stub PokiSDK so the real uph_poki.js wrapper never touches the network
   var noop = function () {};
   window.PokiSDK = {
