@@ -1166,11 +1166,12 @@
         const [wasmRaw, dataRaw, jsRaw] = await Promise.all([
           fetchRaw("gd_web.wasm.raw", 4, true),
           fetchRaw("gd_web.data.raw", 16, true),
-          fetchRaw("gd_web.js.raw", 1, false),
+          fetchRaw("gd_web.js.raw", 1, true),
         ]);
         _0xa84542();
-        Module.wasmBinary = wasmRaw;
-        Module.getPreloadedPackage = () => dataRaw;
+        _0x4d28cd.style.display = "none";
+        Module.wasmBinary = new Uint8Array(wasmRaw);
+        Module.getPreloadedPackage = () => new Uint8Array(dataRaw);
         const scriptEl = document.createElement("script");
         scriptEl.textContent = new TextDecoder().decode(jsRaw);
         document.body.appendChild(scriptEl);
