@@ -134,7 +134,7 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
   // Payloads are served as raw gzip bytes from jsDelivr (under its 20 MB
   // per-file cap). Fetch, inflate with the browser's native gzip stream,
   // then hand Unity the same blob URLs the single-file build produced.
-  var BASE = "__BASE__";
+  var BASE = "https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@d608939628def954eed19921433e356eddd3d242/gladihoppers/";
   async function inflate(file, magic, label) {
     var r = await fetch(BASE + file, { cache: "force-cache" });
     if (!r.ok) throw new Error(label + ': HTTP ' + r.status);
