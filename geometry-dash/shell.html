@@ -1169,8 +1169,8 @@
           fetchRaw("gd_web.js.raw", 1, false),
         ]);
         _0xa84542();
-        Module.wasmBinary = new Uint8Array(wasmRaw);
-        Module.getPreloadedPackage = () => new Uint8Array(dataRaw);
+        Module.wasmBinary = wasmRaw;
+        Module.getPreloadedPackage = () => dataRaw;
         const scriptEl = document.createElement("script");
         scriptEl.textContent = new TextDecoder().decode(jsRaw);
         document.body.appendChild(scriptEl);
