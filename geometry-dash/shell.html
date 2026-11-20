@@ -1138,11 +1138,22 @@
         // them straight to Emscripten. Progress tracks real bytes received.
         async function fetchRaw(name, count, track) {
           const jobs = [];
+          async function get(url) {
+            let last;
+            for (let a = 0; a < 4; a++) {
+              try {
+                const r = await fetch(url + (a ? "?retry=" + a : ""), { cache: a ? "no-store" : "force-cache" });
+                if (r.ok) return r;
+                last = new Error(url + " HTTP " + r.status);
+              } catch (e) { last = e; }
+              await new Promise(res => setTimeout(res, 500 * (a + 1)));
+            }
+            throw last;
+          }
           for (let i = 1; i <= count; i++) {
             const url = name + (count > 1 ? ".part" + i : "");
             jobs.push((async () => {
-              const r = await fetch(url, { cache: "force-cache" });
-              if (!r.ok) throw new Error(url + " HTTP " + r.status);
+              const r = await get(url);
               const reader = r.body.getReader();
               const pieces = [];
               for (;;) {
