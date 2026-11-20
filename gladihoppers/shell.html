@@ -21,8 +21,6 @@
   #bar > i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#c8152a,#f5c842); transition:width .15s ease; }
   #status { font-size:13px; color:#bfa287; min-height:18px; }
   #err { color:#ff8a8a; max-width:80vw; text-align:center; font-size:13px; display:none; }
-  #fs { position:absolute; right:10px; top:10px; z-index:6; background:rgba(10,2,5,.75); color:var(--gold); border:1px solid #5a1a00; border-radius:4px; padding:8px 12px; font:700 11px/1 system-ui,sans-serif; cursor:pointer; display:none; }
-  #fs:hover { border-color:var(--gold); }
 </style>
 </head>
 <body>
@@ -35,7 +33,6 @@
     <div id="status">Preparing the arena...</div>
     <div id="err"></div>
   </div>
-  <button id="fs" title="Toggle fullscreen">[] FULLSCREEN</button>
 </div>
 
 <!-- ============ Unity 2019 WebGL loader ============ -->
@@ -96,7 +93,6 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
   var status = document.getElementById('status');
   var errBox = document.getElementById('err');
   var loading = document.getElementById('loading');
-  var fsBtn = document.getElementById('fs');
 
   function fail(msg) {
     status.style.display = 'none';
@@ -199,7 +195,6 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
         bar.style.width = '100%';
         setTimeout(function () {
           loading.style.display = 'none';
-          fsBtn.style.display = 'block';
           window.focus();
         }, 350);
       },
@@ -207,12 +202,6 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
     });
   }).catch(function (e) {
     fail(e && e.message ? e.message : String(e));
-  });
-
-  fsBtn.addEventListener('click', function () {
-    var el = document.getElementById('unity-container');
-    if (!document.fullscreenElement) { (el.requestFullscreen || el.webkitRequestFullscreen).call(el); }
-    else { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
   });
 })();
 </script>
