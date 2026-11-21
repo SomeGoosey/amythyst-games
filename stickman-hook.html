@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
+<script>
+/* Amythyst reward gate: wait for the player's 10s countdown before granting rewards. */
+(function () {
+  window.__amyRewardAd = function () {
+    return new Promise(function (resolve) {
+      try {
+        if (window.parent === window) { resolve(); return; }
+        var id = "ad" + Date.now() + Math.floor(Math.random() * 1e6);
+        function done(e) {
+          if (e.data && e.data.type === "amythyst-ad-done" && e.data.id === id) {
+            window.removeEventListener("message", done);
+            resolve();
+          }
+        }
+        window.addEventListener("message", done);
+        window.parent.postMessage({ type: "amythyst-ad-reward", id: id }, "*");
+        setTimeout(function () { window.removeEventListener("message", done); resolve(); }, 15000);
+      } catch (e) { resolve(); }
+    });
+  };
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 <title>Stickman Hook</title>
@@ -30616,5 +30639,23 @@ canvas{width:100%}
 
 </script>
 </head>
-<body></body>
+<body><script>
+(function(){
+  function install(){
+    if (window.PokiSDK && typeof window.PokiSDK.rewardedBreak === 'function') {
+      var orig = window.PokiSDK.rewardedBreak;
+      if (orig.__amyWrapped) return true;
+      var wrapped = function(){ return window.__amyRewardAd().then(function(){ return orig.apply(this, arguments); }); };
+      wrapped.__amyWrapped = true;
+      window.PokiSDK.rewardedBreak = wrapped;
+      return true;
+    }
+    return false;
+  }
+  if (!install()) {
+    var n = 0, iv = setInterval(function(){ if (install() || ++n > 100) clearInterval(iv); }, 100);
+  }
+})();
+</script>
+</body>
 </html>

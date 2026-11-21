@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
+<script>
+/* Amythyst reward gate: wait for the player's 10s countdown before granting rewards. */
+(function () {
+  window.__amyRewardAd = function () {
+    return new Promise(function (resolve) {
+      try {
+        if (window.parent === window) { resolve(); return; }
+        var id = "ad" + Date.now() + Math.floor(Math.random() * 1e6);
+        function done(e) {
+          if (e.data && e.data.type === "amythyst-ad-done" && e.data.id === id) {
+            window.removeEventListener("message", done);
+            resolve();
+          }
+        }
+        window.addEventListener("message", done);
+        window.parent.postMessage({ type: "amythyst-ad-reward", id: id }, "*");
+        setTimeout(function () { window.removeEventListener("message", done); resolve(); }, 15000);
+      } catch (e) { resolve(); }
+    });
+  };
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <title>Jetpack Joyride</title>
@@ -266,14 +289,12 @@ html, body {
   function grantReward(source, callback) {
     state.rewardRequests++;
     record("reward-request", source);
-    return new Promise(function (resolve) {
-      setTimeout(function () {
-        state.rewardGrants++;
-        record("reward-granted", source);
-        safe(callback);
-        window.dispatchEvent(new CustomEvent("construct-reward-granted", { detail: { source: source } }));
-        resolve(true);
-      }, 20);
+    return window.__amyRewardAd().then(function () {
+      state.rewardGrants++;
+      record("reward-granted", source);
+      safe(callback);
+      window.dispatchEvent(new CustomEvent("construct-reward-granted", { detail: { source: source } }));
+      return true;
     });
   }
 

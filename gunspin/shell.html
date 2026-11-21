@@ -1,5 +1,28 @@
 <!DOCTYPE html>
 <html lang="en-us"><head>
+<script>
+/* Amythyst reward gate: wait for the player's 10s countdown before granting rewards. */
+(function () {
+  window.__amyRewardAd = function () {
+    return new Promise(function (resolve) {
+      try {
+        if (window.parent === window) { resolve(); return; }
+        var id = "ad" + Date.now() + Math.floor(Math.random() * 1e6);
+        function done(e) {
+          if (e.data && e.data.type === "amythyst-ad-done" && e.data.id === id) {
+            window.removeEventListener("message", done);
+            resolve();
+          }
+        }
+        window.addEventListener("message", done);
+        window.parent.postMessage({ type: "amythyst-ad-reward", id: id }, "*");
+        setTimeout(function () { window.removeEventListener("message", done); resolve(); }, 15000);
+      } catch (e) { resolve(); }
+    });
+  };
+})();
+</script>
+
 <style>
 .webgl-content * {border: 0; margin: 0; padding: 0}
 .webgl-content {position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);}

@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* Amythyst reward gate: wait for the player's 10s countdown before granting rewards. */
+(function () {
+  window.__amyRewardAd = function () {
+    return new Promise(function (resolve) {
+      try {
+        if (window.parent === window) { resolve(); return; }
+        var id = "ad" + Date.now() + Math.floor(Math.random() * 1e6);
+        function done(e) {
+          if (e.data && e.data.type === "amythyst-ad-done" && e.data.id === id) {
+            window.removeEventListener("message", done);
+            resolve();
+          }
+        }
+        window.addEventListener("message", done);
+        window.parent.postMessage({ type: "amythyst-ad-reward", id: id }, "*");
+        setTimeout(function () { window.removeEventListener("message", done); resolve(); }, 15000);
+      } catch (e) { resolve(); }
+    });
+  };
+})();
+</script>
+
 <meta charset="windows-1252">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex, nofollow">
@@ -52,7 +75,7 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
     init: resolved,
     initWithVideoHB: resolved,
     commercialBreak: resolved,
-    rewardedBreak: function () { return Promise.resolve(true); },
+    rewardedBreak: function () { return window.__amyRewardAd().then(function(){ return true; }); },
     getLeaderboard: function () { return Promise.resolve([]); },
     customEvent: noop, displayAd: noop, destroyAd: noop,
     gameLoadingStart: noop, gameLoadingFinished: noop, gameLoadingProgress: noop,
@@ -76,7 +99,7 @@ p=/Mac OS X (1[\.\_\d][\.\_\d]+)/.exec(i)[1];break;case"Android":p=/Android ([\.
     };
     // Ads are skipped instantly; report success so the game never soft-locks.
     window.commercialBreak = function () { send("commercialBreakCompleted"); };
-    window.rewardedBreak = function () { send("rewardedBreakCompleted", "true"); };
+    window.rewardedBreak = function () { window.__amyRewardAd().then(function(){ send("rewardedBreakCompleted", "true"); }); };
     send("ready");
   };
 })();
