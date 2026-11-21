@@ -22,6 +22,8 @@
 
 <script>
 (function(){
+  // srcdoc has an opaque history - ignore pushState/replaceState from SDK
+  try{history.pushState=function(){};history.replaceState=function(){};}catch(e){}
   // No-op any DOM write to a missing element (HUD fields removed in offline wrapper)
   var d = Object.getOwnPropertyDescriptor(HTMLElement.prototype,'innerText');
   if(d) Object.defineProperty(HTMLElement.prototype,'innerText',{configurable:true,
