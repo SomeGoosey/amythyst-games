@@ -277,12 +277,17 @@ function CompatibilityCheck(){hasWebGL?mobile?confirm("Please note that Unity We
 <script>
 /* Keep the WebGL drawing buffer matched to the viewport (the old template leaves it at 300x150). */
 (function () {
+  var lastW = 0, lastH = 0;
   function fit() {
-    try { Module.setCanvasSize(Math.max(320, window.innerWidth), Math.max(240, window.innerHeight)); } catch (e) {}
+    var w = window.innerWidth, h = window.innerHeight;
+    try { var fe = window.frameElement; if (fe && fe.clientWidth > w) w = fe.clientWidth; if (fe && fe.clientHeight > h) h = fe.clientHeight; } catch (e) {}
+    if (w === lastW && h === lastH) return;
+    lastW = w; lastH = h;
+    try { Module.setCanvasSize(Math.max(320, w), Math.max(240, h)); } catch (e) {}
   }
   var tries = 0;
   var timer = setInterval(function () {
-    if (typeof Module.setCanvasSize === 'function') { clearInterval(timer); fit(); window.addEventListener('resize', fit); }
+    if (typeof Module.setCanvasSize === 'function') { clearInterval(timer); fit(); setInterval(fit, 500); }
     else if (++tries > 300) clearInterval(timer);
   }, 100);
 })();
