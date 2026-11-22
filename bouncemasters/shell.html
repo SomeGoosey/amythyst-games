@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.25/bouncemasters/">
+<script>
+/* Amythyst reward gate: rewarded ads use the player's 10s countdown. */
+(function () {
+  window.__amyRewardAd = function () {
+    return new Promise(function (resolve) {
+      try {
+        if (window.parent === window) { resolve(); return; }
+        var id = 'ad' + Date.now() + Math.floor(Math.random() * 1e6);
+        function done(e) {
+          if (e.data && e.data.type === 'amythyst-ad-done' && e.data.id === id) {
+            window.removeEventListener('message', done);
+            resolve();
+          }
+        }
+        window.addEventListener('message', done);
+        window.parent.postMessage({ type: 'amythyst-ad-reward', id: id }, '*');
+        setTimeout(function () { window.removeEventListener('message', done); resolve(); }, 15000);
+      } catch (e) { resolve(); }
+    });
+  };
+  var tries = 0;
+  var timer = setInterval(function () {
+    var sdk = window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad;
+    if (sdk && sdk.requestAd && !sdk.__amyPatched) {
+      var orig = sdk.requestAd;
+      sdk.requestAd = async function (type) {
+        if (type === 'rewarded' && window.__amyRewardAd) await window.__amyRewardAd();
+        return orig.apply(this, arguments);
+      };
+      sdk.__amyPatched = true;
+      clearInterval(timer);
+    } else if (++tries > 200) clearInterval(timer);
+  }, 100);
+})();
+</script>
+<script>
+/* Amythyst: force the official CrazyGames interface into its built-in mock SDK mode. */
+(function () {
+  var Orig = window.URLSearchParams;
+  function Patched(s) { var p = new Orig(s || ''); if (!p.has('mock')) p.set('mock', 'true'); return p; }
+  Patched.prototype = Orig.prototype;
+  window.URLSearchParams = Patched;
+})();
+</script>
+<script src="crazyGames-game-interface.js"></script>
+<!DOCTYPE html><html lang="en-us"><head>
+  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+
+  
+  
+  
+  <title>Bouncemasters</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    html {
+      /* fix mobile viewport menu bar on iOS */
+      height: -webkit-fill-available;
+    }
+
+    body {
+      height: 100%;
+      /* fix mobile viewport menu bar on iOS */
+      height: -webkit-fill-available;
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #unity-container {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Default values, might be overwritten by aspect ratio media queries */
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+    }
+
+
+
+    #unity-loading-container {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 0%;
+      height: 0%;
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 40px;
+
+      opacity: 1;
+      visibility: visible;
+      transition: 800ms linear;
+    }
+
+    #unity-loading-container.finished {
+      opacity: 0;
+      visibility: collapse;
+    }
+
+    #unity-loading-container .logo {
+      width: 15%;
+      height: 15%;
+    }
+
+    #unity-loading-bar {
+      position: relative;
+      width: 40%;
+      height: 10px;
+      background-color: #fff;
+      border: 1px solid #aaa;
+      border-radius: 10px;
+    }
+
+    #unity-loading-bar-inner {
+      position: absolute;
+      left: 0%;
+      top: 0%;
+      width: 1%;
+      height: 100%;
+      background-color: #ccc;
+      border-radius: 10px;
+     transition: none;
+    }
+	
+	#x_unity-loading-bar {
+      position: relative;
+      width: 80vmin;
+      height: max(5px, 0.5vmin);
+      background-color: #555;
+      border-radius: 0.6vmin;
+	  margin-top: -4vmin;
+    }
+
+    /* Portrait: progress = 80% of logo width (logo is square → 28vh) */
+    @media (orientation: portrait) {
+      #x_unity-loading-bar { width: calc(28vh * 0.8); }
+    }
+
+    /* Landscape: progress = 250% of logo width, capped at 90vw */
+    @media (orientation: landscape) {
+      #x_unity-loading-bar { width: min(calc(28vh * 2.9), 90vw); }
+    }
+
+    #x_unity-loading-bar-inner {
+      position: absolute;
+      left: 0%;
+      top: 0%;
+      width: 1%;
+      height: 100%;
+      background-color: #fff;
+      border-radius: 0.6vmin;
+      transition: none;
+    }
+
+    #x_ovl {
+      gap: 4vmin;
+    }
+  </style>
+  <style id="loading-percent-style">
+    .loading-percent {
+      font-feature-settings: "tnum" 1, "lnum" 1;
+      font-variant-numeric: tabular-nums;
+      margin-top: -3vmin;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: max(24px, 2.5vmin);
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      opacity: .9;
+      user-select: none;
+      text-align: center;
+    }
+  </style>
+<style id="amythyst-fullscreen-hardening">
+html,body{border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;background:#000!important;overflow:hidden!important}
+#unity-container,#unity-canvas{border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important}
+</style>
+<link rel="canonical" href="https://www.crazygames.com/game/bouncemasters"></head>
+
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+  <div id="unity-loading-container">
+    <div id="unity-loading-bar">
+      <div id="unity-loading-bar-inner"></div>
+    </div>
+    <div class="loading-percent" id="unity-loading-percent">0%</div>
+  </div>
+  <div id="x_ovl" style="width:100%; height:100%;position: absolute; background-color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+	<img src="logo.webp" style="height: 41vh; width: auto;">
+    <div id="x_unity-loading-bar">
+      <div id="x_unity-loading-bar-inner"></div>
+    </div>
+    <div class="loading-percent" id="x_unity-loading-percent">0%</div>
+  </div>
+
+  <script>
+    (function() {
+      var ua = navigator.userAgent;
+      var isSafari = /Version\/[\d.]+.*Safari/i.test(ua) && !/Chrome|Chromium|Android/i.test(ua);
+
+      if (!isSafari) {
+        [
+          { href: "Build/Build.data.unityweb", as: "fetch", crossorigin: true },
+          { href: "Build/Build.wasm.unityweb", as: "fetch", type: "application/wasm", crossorigin: true }
+        ].forEach(function(d) {
+          var l = document.createElement("link");
+          l.rel = "preload";
+          l.href = d.href;
+          l.as = d.as;
+          if (d.type) l.type = d.type;
+          if (d.crossorigin) l.crossOrigin = "anonymous";
+          document.head.appendChild(l);
+        });
+      }
+    })();
+
+    window.GameInterface.init(["Build/Build.loader.js", async function() {
+		var buildUrl = "Build";
+		var loaderUrl = buildUrl + "/Build.loader.js";
+		var config = {
+		  dataUrl: buildUrl + "/Build.data.unityweb",
+		  frameworkUrl: buildUrl + "/Build.framework.js.unityweb",
+		  codeUrl: buildUrl + "/Build.wasm.unityweb",
+		  streamingAssetsUrl: "StreamingAssets",
+		  companyName: "Playgendary",
+		  productName: "Bouncemasters",
+		  productVersion: "2.4.4",
+		};
+
+		var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+		if(isMobile) {
+		  // Define a maximum pixel ratio for mobile to avoid rendering at too high resolutions
+		  const maxPixelRatioMobile = 2.0;
+		  config.devicePixelRatio = Math.min(window.devicePixelRatio, maxPixelRatioMobile);
+		}
+
+		var canvas = document.querySelector("#unity-canvas");
+		var loadingContainer = document.querySelector("#unity-loading-container");
+		var loadingBar = document.querySelector("#unity-loading-bar-inner");
+		var overlayBar = document.getElementById("x_unity-loading-bar-inner");
+		var overlayRoot = document.getElementById("x_ovl");
+	  		
+		//const url = "Localization.json";
+		//try {
+			//const response = await fetch(url);
+			//if (response.ok) {
+				//const str = await response.text();
+				//window.LocalizationData = str;
+			//}
+		//} catch (error) {}
+
+      window.GameInterface.onOffsetChange(function(offsets) {
+        var unityCont = document.getElementById("unity-container");
+
+        unityCont.style.width = 'auto';
+        unityCont.style.height = 'auto';
+        unityCont.style.left = offsets.left + "px";
+        unityCont.style.top = offsets.top + "px";
+        unityCont.style.right = offsets.right + "px";
+        unityCont.style.bottom = offsets.bottom + "px";
+      });
+
+      var ended = false;
+      var gameStarted = false;
+      var curMaxPerc = 80;
+      var prevProgress = -1;
+      var numFramesPercCorrect = 0;
+      var realUnityPerc = 0;
+      var displayPerc = 0;
+      var realProgressCap = 92;
+      var autoTailCap = 96;
+      var autoTailStep = 0.10;
+      var finalProgressSent = false;
+      var finalAnimStart = 0;
+      var finalAnimDuration = 250;
+
+      window.onGameStarted = function() {
+        if (gameStarted) return;
+        gameStarted = true;
+        finalAnimStart = performance.now();
+        displayPerc = 100;
+      };
+
+      function normalizePerc(rawPerc) {
+        var perc = Number(rawPerc) || 0;
+
+        if (perc === 90 && numFramesPercCorrect < 30) {
+          numFramesPercCorrect++;
+          perc = 0;
+        } else if (perc > 0 && perc !== 90 && numFramesPercCorrect < 30) {
+
+          numFramesPercCorrect = 100;
+        }
+
+        if (perc >= 99.9) {
+          perc = curMaxPerc;
+          curMaxPerc += 0.05;
+          if (curMaxPerc > realProgressCap) curMaxPerc = realProgressCap;
+
+        } else {
+          perc = perc * 0.9;
+          if (perc > realProgressCap) perc = realProgressCap;
+        }
+
+        return perc;
+      }
+
+      function finishOverlay() {
+        if (finalProgressSent) return;
+        finalProgressSent = true;
+        if (window.GameInterface && window.GameInterface.sendPreloadProgress) {
+          window.GameInterface.sendPreloadProgress(100);
+        }
+        if (overlayRoot && overlayRoot.parentNode) {
+          overlayRoot.remove();
+        }
+        ended = true;
+      }
+
+      function updt() {
+        if (ended) return;
+
+        var targetPerc;
+        if (gameStarted) {
+          targetPerc = 100;
+          displayPerc = 100;
+        } else {
+          var nextPerc = normalizePerc(realUnityPerc);
+          var tailPerc = Math.min(displayPerc + autoTailStep, autoTailCap);
+          targetPerc = Math.max(nextPerc, tailPerc);
+          if (targetPerc > autoTailCap) targetPerc = autoTailCap;
+
+          if (displayPerc < targetPerc) {
+            var delta = targetPerc - displayPerc;
+            var step = Math.max(delta * 0.26, 0.18);
+            displayPerc += step;
+            if (displayPerc > targetPerc) displayPerc = targetPerc;
+          }
+        }
+
+        var curProgress = Math.floor(displayPerc);
+        if (curProgress !== prevProgress && window.GameInterface && window.GameInterface.sendPreloadProgress) {
+          window.GameInterface.sendPreloadProgress(curProgress);
+        }
+        prevProgress = curProgress;
+
+        overlayBar.style.width = displayPerc + "%";
+
+        if (gameStarted && performance.now() - finalAnimStart >= finalAnimDuration) {
+          finishOverlay();
+          return;
+        }
+
+        requestAnimationFrame(updt);
+      }
+
+      requestAnimationFrame(updt);
+
+      var unityGame;
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = function() {
+        createUnityInstance(canvas, config, function(progress) {
+          realUnityPerc = 100 * progress;
+          loadingBar.style.width = realUnityPerc + "%";
+        }).then(function(unityInstance) {
+          unityGame = unityInstance;
+          loadingContainer.classList.add("finished");
+          if (window.onGameStarted) window.onGameStarted();
+          setTimeout(function () {
+            var o = document.getElementById('x_ovl');
+            if (o && o.parentNode) o.parentNode.removeChild(o);
+          }, 400);
+        }).catch(function(message) {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    }]).then(function(result) {
+      // start the game...
+    });
+  </script>
+
+  <script id="loading-percent-sync">
+    (function() {
+      function clamp(n) { return Math.min(100, Math.max(0, Math.round(n))); }
+      function track() {
+        var inner = document.getElementById("x_unity-loading-bar-inner");
+        var label = document.getElementById("x_unity-loading-percent");
+        if (!inner || !label) return;
+
+        var container = inner.parentElement;
+        function tick() {
+          if (!document.body.contains(inner)) return;
+          var cr = container.getBoundingClientRect();
+          var ir = inner.getBoundingClientRect();
+          var perc = cr.width > 0 ? (ir.width / cr.width) * 100 : 0;
+          label.textContent = clamp(perc) + "%";
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      if (document.readyState === "complete" || document.readyState === "interactive") {
+        track();
+      } else {
+        document.addEventListener("DOMContentLoaded", track);
+      }
+    })();
+  </script>
+
+
+
+</body></html>
