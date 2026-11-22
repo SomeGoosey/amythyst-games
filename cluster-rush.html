@@ -277,7 +277,7 @@ function CompatibilityCheck(){hasWebGL?mobile?confirm("Please note that Unity We
 <script>
 /* Keep the WebGL drawing buffer matched to the viewport (the old template leaves it at 300x150). */
 (function () {
-  var lastW = 0, lastH = 0;
+  var lastW = -1, lastH = -1;
   function fit() {
     var w = window.innerWidth, h = window.innerHeight;
     try { var fe = window.frameElement; if (fe && fe.clientWidth > w) w = fe.clientWidth; if (fe && fe.clientHeight > h) h = fe.clientHeight; } catch (e) {}
