@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-<base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.26/bouncemasters/">
+<base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.27/bouncemasters/">
 <script>
 /* Amythyst reward gate: rewarded ads use the player's 10s countdown. */
 (function () {
@@ -242,13 +242,13 @@ html,body{border:0!important;border-radius:0!important;box-shadow:none!important
     })();
 
     window.GameInterface.init(["Build/Build.loader.js", async function() {
-		var buildUrl = "Build";
+		var buildUrl = "https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.27/bouncemasters/Build";
 		var loaderUrl = buildUrl + "/Build.loader.js";
 		var config = {
 		  dataUrl: buildUrl + "/Build.data.unityweb",
 		  frameworkUrl: buildUrl + "/Build.framework.js.unityweb",
 		  codeUrl: buildUrl + "/Build.wasm.unityweb",
-		  streamingAssetsUrl: "StreamingAssets",
+		  streamingAssetsUrl: "https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.27/bouncemasters/StreamingAssets",
 		  companyName: "Playgendary",
 		  productName: "Bouncemasters",
 		  productVersion: "2.4.4",
