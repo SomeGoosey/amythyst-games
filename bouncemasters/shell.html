@@ -3,7 +3,7 @@
 <head>
 <base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.27/bouncemasters/">
 <script>
-/* Amythyst reward gate: rewarded ads use the player's 10s countdown. */
+/* Amythyst: rewarded ads + persistent saves for the official CrazyGames mock SDK. */
 (function () {
   window.__amyRewardAd = function () {
     return new Promise(function (resolve) {
@@ -22,21 +22,59 @@
       } catch (e) { resolve(); }
     });
   };
-  var tries = 0;
+  var tries = 0, patched = false;
   var timer = setInterval(function () {
-    var sdk = window.CrazyGames && window.CrazyGames.SDK && window.CrazyGames.SDK.ad;
-    if (sdk && sdk.requestAd && !sdk.__amyPatched) {
-      var orig = sdk.requestAd;
-      sdk.requestAd = async function (type) {
-        if (type === 'rewarded' && window.__amyRewardAd) await window.__amyRewardAd();
-        return orig.apply(this, arguments);
+    var GI = window.GameInterface;
+    var SDK = window.CrazyGames && window.CrazyGames.SDK;
+    if (!GI || !SDK || !SDK.ad) { if (++tries > 400) clearInterval(timer); return; }
+    if (patched) return;
+    patched = true;
+
+    // Rewarded ads: make them available and route the reward through the 10s gate.
+    GI.isRewardedAdAvailable = function () { return true; };
+    GI.hasRewardedAd = async function () { return true; };
+    var origFeature = GI.hasFeature;
+    GI.hasFeature = function (e) { return e === 'rewarded' ? true : (origFeature ? origFeature.call(this, e) : false); };
+    GI.showRewardedAd = async function () { await window.__amyRewardAd(); return { isRewardGranted: true }; };
+    if (window.famobi) {
+      window.famobi.hasRewardedAd = function () { return true; };
+      window.famobi.rewardedAd = async function (cb) {
+        await window.__amyRewardAd();
+        if (typeof cb === 'function') cb({ rewardGranted: true });
       };
-      sdk.__amyPatched = true;
-      clearInterval(timer);
-    } else if (++tries > 200) clearInterval(timer);
+    }
+    SDK.ad.isRewardedAdAvailable = function () { return true; };
+    var origReq = SDK.ad.requestAd;
+    SDK.ad.requestAd = async function (type) {
+      if (type === 'rewarded') await window.__amyRewardAd();
+      return origReq.apply(this, arguments);
+    };
+
+    // Persistent saves: the mock SDK keeps data in memory; back it with localStorage.
+    var LS = window.localStorage, PFX = 'bouncemasters:';
+    function k(name) { return PFX + name; }
+    if (SDK.data) {
+      SDK.data.getItem = async function (name) {
+        try { return LS.getItem(k(name)); } catch (e) { return null; }
+      };
+      SDK.data.setItem = async function (name, value) {
+        try { LS.setItem(k(name), String(value)); } catch (e) {}
+      };
+      SDK.data.removeItem = async function (name) {
+        try { LS.removeItem(k(name)); } catch (e) {}
+      };
+      SDK.data.clear = async function () {
+        try {
+          for (var i = LS.length - 1; i >= 0; i--) {
+            var n = LS.key(i);
+            if (n && n.indexOf(PFX) === 0) LS.removeItem(n);
+          }
+        } catch (e) {}
+      };
+    }
+    clearInterval(timer);
   }, 100);
-})();
-</script>
+})();</script>
 <script>
 /* Amythyst: force the official CrazyGames interface into its built-in mock SDK mode. */
 (function () {
