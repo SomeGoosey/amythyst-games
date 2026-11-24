@@ -92,8 +92,12 @@ window.famobi = {
     var a = this._listeners[t] || []; var i = a.indexOf(fn); if (i >= 0) a.splice(i, 1);
   };
   FakeXHR.prototype._fire = function (t, ev) {
-    var fn = this['on' + t]; if (typeof fn === 'function') fn.call(this, ev);
-    (this._listeners[t] || []).slice().forEach(function (f) { f.call(this, ev); }, this);
+    if (!ev.target) ev.target = this;
+    if (!ev.currentTarget) ev.currentTarget = this;
+    if (typeof ev.defaultPrevented !== 'boolean') ev.defaultPrevented = false;
+    var fn = this['on' + t];
+    if (typeof fn === 'function') { try { fn.call(this, ev); } catch (e) {} }
+    (this._listeners[t] || []).slice().forEach(function (f) { try { f.call(this, ev); } catch (e) {} }, this);
   };
   FakeXHR.prototype.open = function (m, u) { this._key = window.__AMY_KEY(u); if (!this._key) this._real.open.apply(this._real, arguments); };
   FakeXHR.prototype.setRequestHeader = function () { if (!this._key) this._real.setRequestHeader.apply(this._real, arguments); };
@@ -108,7 +112,8 @@ window.famobi = {
       self.readyState = 4;
       var ev = { target: self, currentTarget: self, lengthComputable: true, loaded: b.length, total: b.length };
       // OpenFL's URLRequest loader listens on onreadystatechange (readyState 4).
-      if (typeof self.onreadystatechange === 'function') { try { self.onreadystatechange(ev); } catch (e) {} }
+      // OpenFL sets xhr.onreadystatechange; fire it with a proper event object.
+      // _fire also dispatches listeners registered via addEventListener('readystatechange').
       self._fire('readystatechange', ev);
       self._fire('progress', ev); self._fire('load', ev); self._fire('loadend', ev);
     }, 0);
