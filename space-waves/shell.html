@@ -102,7 +102,7 @@ function createUnityInstance(t,n,d){function c(e,t){if(!c.aborted&&n.showBanner)
         dataUrl: URL.createObjectURL(new Blob([data])),
         frameworkUrl: URL.createObjectURL(new Blob([framework], { type: 'text/javascript' })),
         codeUrl: URL.createObjectURL(new Blob([wasm], { type: 'application/wasm' })),
-        streamingAssetsUrl: 'StreamingAssets',
+        streamingAssetsUrl: 'https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.42/space-waves/StreamingAssets',
         companyName: 'CrazyGames', productName: 'Space Waves', productVersion: '1.0'
       };
       await createUnityInstance(document.getElementById('unity-canvas'), config, function (p) {});

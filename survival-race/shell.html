@@ -1093,7 +1093,7 @@ function OpenAuthDialog() {}
         dataUrl: URL.createObjectURL(new Blob([loads[0]])),
         frameworkUrl: URL.createObjectURL(new Blob([loads[1]], { type: 'text/javascript' })),
         codeUrl: URL.createObjectURL(new Blob([join(loads.slice(2))], { type: 'application/wasm' })),
-        streamingAssetsUrl: 'StreamingAssets',
+        streamingAssetsUrl: 'https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.42/survival-race/StreamingAssets',
         companyName: 'Survival', productName: 'Survival Race', productVersion: '0.0.15'
       };
       await createUnityInstance(canvas, config, function (p) {
