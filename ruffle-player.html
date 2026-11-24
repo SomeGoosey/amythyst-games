@@ -3766,6 +3766,12 @@ ${A.stack}
 <body>
 <div id="amy-flash-box"></div>
 <script>
+/* Block games from opening promo/App Store popups (they steal focus and look like a white/black screen). */
+(function(){
+  var origOpen=window.open;
+  window.open=function(u){ if(/flipline|itunes|apple\.com|google|crazygames|http/i.test(String(u||''))) return null; return origOpen.apply(this,arguments); };
+  window.addEventListener('beforeunload',function(e){ e.preventDefault(); e.returnValue=''; });
+})();
 /* Offline ad stub: Flipline's ad-config endpoint is CORS-blocked and stalls game transitions. */
 (function () {
   var origFetch = window.fetch;
