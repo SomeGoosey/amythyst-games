@@ -1053,9 +1053,9 @@ function PromptShow() {}
 function PaintRBT(rbt) {}
 function StaticRBTDeactivate() {}
 function SaveCloud(jsonData, flush) {}
-function LoadCloud(sendback) {}
-function RequestingEnvironmentData(sendback) {}
-function InitPlayer(sendback) {}
+function LoadCloud(sendback) { try { sendback(cloudSaves); } catch (e) {} }
+function RequestingEnvironmentData(sendback) { try { sendback(environmentData); } catch (e) {} }
+function InitPlayer(sendback) { try { sendback(NotAuthorized()); } catch (e) {} }
 function NotAuthorized() {
   return JSON.stringify({ playerAuth: 'rejected', playerName: 'unauthorized', playerId: 'unauthorized', playerPhoto: 'null' });
 }
