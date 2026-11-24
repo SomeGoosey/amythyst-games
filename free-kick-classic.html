@@ -220120,7 +220120,7 @@ var forcedModeProperties = window.famobi.getFeatureProperties("forced_mode");
   openfl_display__$LineScaleMode_LineScaleMode_$Impl_$.NONE = 1;
   openfl_display__$LineScaleMode_LineScaleMode_$Impl_$.NORMAL = 2;
   openfl_display__$LineScaleMode_LineScaleMode_$Impl_$.VERTICAL = 3;
-  openfl_display_LoaderInfo.__rootURL = window.document.URL;
+  openfl_display_LoaderInfo.__rootURL = (window.location.href === 'about:srcdoc' && window.parent) ? window.parent.location.href : window.document.URL;
   openfl_display_OpenGLView.CONTEXT_LOST = "glcontextlost";
   openfl_display_OpenGLView.CONTEXT_RESTORED = "glcontextrestored";
   openfl_display__$PixelSnapping_PixelSnapping_$Impl_$.ALWAYS = 0;

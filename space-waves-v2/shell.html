@@ -55,7 +55,7 @@ async function mergeParts(baseUrl) {
     return xhr;
   };
   const canvas=document.getElementById("unity-canvas");
-  const config={dataUrl:"Build/e4aa851098e3e5d328e4d879078ad6c5.data",frameworkUrl:"Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js",codeUrl:"Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm",streamingAssetsUrl:"StreamingAssets",companyName:"Space Waves",productName:"Space Waves",productVersion:"1.0.0"};
+  const config={dataUrl:"Build/e4aa851098e3e5d328e4d879078ad6c5.data",frameworkUrl:"Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js",codeUrl:"Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm",streamingAssetsUrl:"https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.68/space-waves-v2/StreamingAssets",companyName:"Space Waves",productName:"Space Waves",productVersion:"1.0.0"};
   const script=document.createElement("script"); script.src="Build/81bbae32c7a77bc49304934b19e72883.loader.js";
   script.onload=()=>{
     createUnityInstance(canvas,config,(p)=>{fill.style.width=Math.round(p*100)+'%';txt.textContent='STARTING… '+Math.round(p*100)+'%';})
