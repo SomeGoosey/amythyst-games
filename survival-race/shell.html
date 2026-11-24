@@ -1026,12 +1026,13 @@ function createUnityInstance(t, n, d) {
 </script>
 </head>
 <body>
+<div id="amy-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px system-ui;background:#000;z-index:10">Loading game…</div>
 <div id="gameContainer"><canvas id="unity-canvas" width="960" height="540"></canvas></div>
 <script>
 /* Offline Yandex-style SDK stubs used by the official Survival Race build. */
-var cloudSaves = '{}';
+var cloudSaves = 'noData';
 var environmentData = 'null';
-var playerData = '{\"playerAuth\":\"rejected\",\"playerName\":\"unauthorized\",\"playerId\":\"unauthorized\",\"playerPhoto\":\"null\",\"photoSize\":\"1\",\"SDKEnabled\":false}';
+var playerData = 'noData';
 function InitGame() { console.log('Init Game Success'); }
 function FullAdShow() {}
 function RewardedShow(id) {}
@@ -1053,14 +1054,9 @@ function PromptShow() {}
 function PaintRBT(rbt) {}
 function StaticRBTDeactivate() {}
 function SaveCloud(jsonData, flush) {}
-function LoadCloud(sendback) { try { sendback(cloudSaves); } catch (e) {} }
-function RequestingEnvironmentData(sendback) { try { sendback(environmentData); } catch (e) {} }
-function InitPlayer(sendback) {
-  try {
-    console.log('AMY InitPlayer sendback type:', typeof sendback);
-    sendback(JSON.stringify({ playerAuth: 'authorized', playerName: 'Player', playerId: 'amy-player', playerPhoto: 'null' }));
-  } catch (e) { console.log('AMY InitPlayer err', e && e.message); }
-}
+function LoadCloud(sendback) {}
+function RequestingEnvironmentData(sendback) {}
+function InitPlayer(sendback) {}
 function NotAuthorized() {
   return JSON.stringify({ playerAuth: 'rejected', playerName: 'unauthorized', playerId: 'unauthorized', playerPhoto: 'null' });
 }
@@ -1094,6 +1090,7 @@ function OpenAuthDialog() {}
         list.forEach(function (a) { out.set(a, off); off += a.length; });
         return out;
       }
+      var loading = document.getElementById('amy-loading');
       var config = {
         dataUrl: URL.createObjectURL(new Blob([loads[0]])),
         frameworkUrl: URL.createObjectURL(new Blob([loads[1]], { type: 'text/javascript' })),
@@ -1102,9 +1099,11 @@ function OpenAuthDialog() {}
         companyName: 'Survival', productName: 'Survival Race', productVersion: '0.0.15'
       };
       await createUnityInstance(canvas, config, function (p) {
+        if (loading) loading.textContent = 'Loading ' + Math.round(p * 100) + '%';
         canvas.style.background = 'linear-gradient(to right, white, white ' + (p*100) + '%, transparent ' + (p*100) + '%, transparent) no-repeat center';
         canvas.style.backgroundSize = '100% 1rem';
       });
+      if (loading) loading.remove();
       onResize();
     } catch (e) { fail(e && e.message ? e.message : e); }
   })();

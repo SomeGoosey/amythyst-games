@@ -75,6 +75,7 @@ function createUnityInstance(t,n,d){function c(e,t){if(!c.aborted&&n.showBanner)
 </script>
 </head>
 <body>
+<div id="amy-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px system-ui;background:#13141E;z-index:10">Loading assets…</div>
 <div id="unity-container"><canvas id="unity-canvas"></canvas></div>
 <script>
 (function () {
@@ -98,6 +99,7 @@ function createUnityInstance(t,n,d){function c(e,t){if(!c.aborted&&n.showBanner)
       var data = loads[0];
       var framework = loads[1];
       var wasm = join(loads.slice(2));
+      var loading = document.getElementById('amy-loading');
       var config = {
         dataUrl: URL.createObjectURL(new Blob([data])),
         frameworkUrl: URL.createObjectURL(new Blob([framework], { type: 'text/javascript' })),
