@@ -18,6 +18,25 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
 <div id="loading-text"><div>SPACE WAVES</div><div class="bar"><div class="fill" id="lf"></div></div><div class="sub" id="lt">LOADING ASSETS…</div></div>
 <canvas id="unity-canvas"></canvas>
 <script>
+/* Offline CrazySDK compatibility shim: fill methods missing from the bundled SDK. */
+(function(){
+  window.CrazyGames = window.CrazyGames || {};
+  var sdk = window.CrazyGames.SDK = window.CrazyGames.SDK || {};
+  ['ad','game','user','analytics'].forEach(function(k){ sdk[k] = sdk[k] || {}; });
+  var ad = sdk.ad;
+  ['addAdblockPopupListener','addEventListener','removeEventListener','setAdblockPopupEnabled'].forEach(function(k){
+    if(typeof ad[k] !== 'function') ad[k] = function(){};
+  });
+  if(typeof ad.hasAdblock !== 'function') ad.hasAdblock = function(){ return Promise.resolve(false); };
+  if(typeof ad.requestAd !== 'function') ad.requestAd = function(){ return Promise.resolve('completed'); };
+  if(typeof ad.isRewardedAdAvailable !== 'function') ad.isRewardedAdAvailable = function(){ return Promise.resolve(true); };
+  ['loadingStart','loadingStop','gameplayStart','gameplayStop','happytime','addSettingsChangeListener'].forEach(function(k){
+    if(typeof sdk.game[k] !== 'function') sdk.game[k] = function(){};
+  });
+  if(typeof sdk.init !== 'function') sdk.init = function(){ return Promise.resolve(); };
+})();
+</script>
+<script>
 const SPLIT_MAP = {"9adf8a1aafea4c2333e26d66a8b36d56.wasm": null};
 async function getBytes(url, mime){
   for(var a=1;a<=6;a++){
