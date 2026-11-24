@@ -3766,6 +3766,20 @@ ${A.stack}
 <body>
 <div id="amy-flash-box"></div>
 <script>
+/* Offline ad stub: Flipline's ad-config endpoint is CORS-blocked and stalls game transitions. */
+(function () {
+  var origFetch = window.fetch;
+  var STUB = '<response><success>false</success><version>2.0</version><ato>0</ato><bto>0</bto></response>';
+  window.fetch = function (input, init) {
+    var u = typeof input === 'string' ? input : (input && input.url) || '';
+    if (/fliplineads\.com/i.test(u)) {
+      return Promise.resolve(new Response(STUB, { status: 200, headers: { 'Content-Type': 'text/xml' } }));
+    }
+    return origFetch.apply(this, arguments);
+  };
+})();
+</script>
+<script>
 (async function () {
   var box = document.getElementById('amy-flash-box');
   function fail(msg) { box.innerHTML = '<div class="err">' + String(msg) + '</div>'; }
