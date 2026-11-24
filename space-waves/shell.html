@@ -57,11 +57,12 @@ window.CrazyGames = { SDK: {
     if (String(tag).toLowerCase() === 'script') {
       Object.defineProperty(el, 'src', {
         configurable: true,
-        get: function () { return this._amySrc || ''; },
+        get: function () { return this.getAttribute('src') || ''; },
         set: function (v) {
-          this._amySrc = String(v).indexOf('sdk.crazygames.com') !== -1
+          v = String(v);
+          this.setAttribute('src', v.indexOf('sdk.crazygames.com') !== -1
             ? URL.createObjectURL(new Blob(['/* Amythyst CrazySDK stub */'], { type: 'text/javascript' }))
-            : v;
+            : v);
         }
       });
     }
