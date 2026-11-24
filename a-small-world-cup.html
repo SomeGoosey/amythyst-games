@@ -137,6 +137,7 @@ var __amySdk = {
 };
 window.CrazySDK = __amySdk;
 window.CrazyGames = Object.assign({ SDK: __amySdk }, __amySdk);
+window.CrazyGamesConstructSDK = __amySdk;
 window.__AMY_BYTES = function (key) {
   var s = atob(window.__AMY_B64[key]), a = new Uint8Array(s.length);
   for (var i = 0; i < s.length; i++) a[i] = s.charCodeAt(i);
