@@ -47,7 +47,13 @@ window.__AMY_BLOB = function (k) {
   return window.__AMY_BLOBS[k];
 };
 var __fkeys = ['EVENT_LEVELFAIL','EVENT_LEVELRESTART','EVENT_LEVELSCORE','EVENT_LEVELSTART','EVENT_LEVELSUCCESS','EVENT_LIVESCORE','EVENT_TOTALSCORE','EVENT_TUTORIALCOMPLETED','EVENT_TUTORIALSKIPPED','EVENT_VOLUMECHANGE','SCREEN_BONUS','SCREEN_CHARACTER','SCREEN_CREDITS','SCREEN_GAMERESULT','SCREEN_HELP','SCREEN_HOME','SCREEN_LEVEL','SCREEN_LEVELINTRO','SCREEN_LEVELLOADING','SCREEN_LEVELRESULT','SCREEN_LEVELSELECT','SCREEN_PAUSE','SCREEN_SETTINGS','SCREEN_SHOP','SCREEN_SPLASH','SCREEN_TUTORIAL'];
-window.famobi_analytics = { trackEvent: function(){}, trackScreen: function(){}, trackStats: function(){}, getPageTitle: function(){ return 'Free Kick Classic'; } };
+window.famobi_analytics = {
+  // The game chains .then() on trackEvent/trackScreen/trackStats — must return a Promise.
+  trackEvent: function(){ return Promise.resolve(); },
+  trackScreen: function(){ return Promise.resolve(); },
+  trackStats: function(){ return Promise.resolve(); },
+  getPageTitle: function(){ return 'Free Kick Classic'; }
+};
 __fkeys.forEach(function (k) { window.famobi_analytics[k] = k; });
 window.famobi = {
   hasFeature: function () { return false; },
