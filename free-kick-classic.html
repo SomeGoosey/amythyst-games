@@ -107,6 +107,9 @@ window.famobi = {
       self.responseText = /json|text|javascript|xml/.test(window.__AMY_MIME[self._key]) ? new TextDecoder().decode(b) : '';
       self.readyState = 4;
       var ev = { target: self, currentTarget: self, lengthComputable: true, loaded: b.length, total: b.length };
+      // OpenFL's URLRequest loader listens on onreadystatechange (readyState 4).
+      if (typeof self.onreadystatechange === 'function') { try { self.onreadystatechange(ev); } catch (e) {} }
+      self._fire('readystatechange', ev);
       self._fire('progress', ev); self._fire('load', ev); self._fire('loadend', ev);
     }, 0);
   };
