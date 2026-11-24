@@ -72,6 +72,15 @@ window.famobi = {
     return origFetch.apply(this, arguments);
   };
   var RealXHR = window.XMLHttpRequest;
+  // Rewrite the external model request at the real XHR level: openfl loads the AWD
+  // through XHR, and the FakeXHR wrapper below only handles embedded keys.
+  var __realOpen = RealXHR.prototype.open;
+  RealXHR.prototype.open = function (m, u) {
+    if (String(u).indexOf('FreeKickClassic.awd') !== -1) {
+      u = window.__AMY_REMOTE['assets/FreeKickClassic.awd'];
+    }
+    return __realOpen.call(this, m, u, arguments[2], arguments[3], arguments[4]);
+  };
   function FakeXHR() {
     this._real = new RealXHR(); this._key = null; this.status = 0; this.response = null;
     this.responseText = ''; this.readyState = 0; this._listeners = {};
