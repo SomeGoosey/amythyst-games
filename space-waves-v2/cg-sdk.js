@@ -1,0 +1,1 @@
+Package size exceeded the configured limit of 50 MB. Try https://github.com/bubblfan/cg-rip/tree/main/space-waves/cg-sdk.js instead.
