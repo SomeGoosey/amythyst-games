@@ -78,10 +78,15 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
     }).catch(function(e){clearTimeout(t);throw e});
   }
   async function getPart(i){
-    var url='Build/GrannyPortButBetter.data.unityweb.part'+i;
-    for(var attempt=1;attempt<=4;attempt++){
+    var base='Build/GrannyPortButBetter.data.unityweb.part'+i;
+    for(var attempt=1;attempt<=6;attempt++){
+      // cache-bust retries: jsDelivr can cache a transient 403 for a binary part
+      var url=base+(attempt>1?('?retry='+attempt+'&t='+Date.now()):'');
       try{ return new Uint8Array(await fetchWithTimeout(url,45000)); }
-      catch(e){ if(attempt===4) throw new Error('part '+i+' failed: '+(e&&e.message)); }
+      catch(e){
+        if(attempt===6) throw new Error('part '+i+' failed: '+(e&&e.message));
+        await new Promise(function(r){setTimeout(r, 800*attempt)});
+      }
     }
   }
   async function run(){
