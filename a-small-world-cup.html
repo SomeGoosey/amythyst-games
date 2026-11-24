@@ -195,7 +195,7 @@ window.__AMY_BLOB = function (key) {
       get: function () { return d.get.call(this); },
       set: function (v) {
         var key = window.__AMY_KEY(v);
-        if (String(v).indexOf('crazygames-sdk') !== -1) {
+        if (/crazygames|CrazySDK/i.test(String(v))) {
           key = '__amy_crazysdk_stub';
           if (!window.__AMY_B64[key]) {
             var stub = "window.CrazySDK=window.CrazyGames={init:function(){return Promise.resolve();},environment:'crazygames',isInitialized:true,game:{loadingStart:function(){},loadingStop:function(){},gameplayStart:function(){},gameplayStop:function(){},happytime:function(){},addSettingsChangeListener:function(){},setPause:function(){}},ad:{requestAd:function(){return Promise.resolve('completed');},isRewardedAdAvailable:function(){return true;},hasAdblock:function(){return Promise.resolve(false);},addAdblockPopupListener:function(){}},user:{getUser:function(){return Promise.resolve({id:'amy',username:'Player'});},isUserAccountAvailable:false},analytics:{trackEvent:function(){}}};";
