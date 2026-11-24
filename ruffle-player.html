@@ -3829,7 +3829,13 @@ ${A.stack}
     box.appendChild(player);
     await player.load({ url: url, autoplay: true, unmuteOverlay: false,
       backgroundColor: '#000000', scale: 'exactFit', forceScale: true,
-      preferredRenderer: 'webgl', splashScreen: false });
+      preferredRenderer: 'webgl', splashScreen: false,
+      // These large Flash games execute long ActionScript frames; Ruffle's
+      // default 15s execution cap aborts them mid-cutscene (black screen).
+      maxExecutionDuration: 240,
+      allowNetworking: 'all',
+      compatibilityRules: false,
+      menu: false });
     player.play();
   } catch (e) { fail(e && e.message ? e.message : e); }
 })();
