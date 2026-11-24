@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-<base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.74/space-waves-v2/">
+<base href="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.79/space-waves-v2/">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Space Waves</title>
@@ -80,7 +80,7 @@ async function mergeParts(baseUrl, count, mime){
     return xhr;
   };
   const canvas=document.getElementById("unity-canvas");
-  const config={dataUrl:"Build/e4aa851098e3e5d328e4d879078ad6c5.data?v=77",frameworkUrl:"Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js?v=77",codeUrl:"Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm",streamingAssetsUrl:"https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.74/space-waves-v2/StreamingAssets",companyName:"Space Waves",productName:"Space Waves",productVersion:"1.0.0"};
+  const config={dataUrl:"Build/e4aa851098e3e5d328e4d879078ad6c5.data?v=77",frameworkUrl:"Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js?v=77",codeUrl:"Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm",streamingAssetsUrl:"https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.79/space-waves-v2/StreamingAssets",companyName:"Space Waves",productName:"Space Waves",productVersion:"1.0.0"};
   const script=document.createElement("script"); script.src="Build/81bbae32c7a77bc49304934b19e72883.loader.js";
   script.onload=()=>{
     createUnityInstance(canvas,config,(p)=>{fill.style.width=Math.round(p*100)+'%';txt.textContent='STARTING… '+Math.round(p*100)+'%';})
