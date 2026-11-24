@@ -79,13 +79,22 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
   }
   async function getPart(i){
     var base='Build/GrannyPortButBetter.data.unityweb.part'+i;
-    for(var attempt=1;attempt<=6;attempt++){
-      // cache-bust retries: jsDelivr can cache a transient 403 for a binary part
-      var url=base+(attempt>1?('?retry='+attempt+'&t='+Date.now()):'');
-      try{ return new Uint8Array(await fetchWithTimeout(url,45000)); }
-      catch(e){
-        if(attempt===6) throw new Error('part '+i+' failed: '+(e&&e.message));
-        await new Promise(function(r){setTimeout(r, 800*attempt)});
+    for(var attempt=1;attempt<=5;attempt++){
+      var url=base+(attempt>1?('?retry='+attempt):'');
+      var ctl=new AbortController(), timer=setTimeout(function(){ctl.abort()},60000);
+      try{
+        var r=await fetch(url,{signal:ctl.signal,cache:attempt>1?'no-store':'force-cache'});
+        clearTimeout(timer);
+        if(!r.ok) throw new Error('HTTP '+r.status+' '+url);
+        var reader=r.body.getReader(), chunks=[], len=0;
+        for(;;){var x=await reader.read(); if(x.done)break; chunks.push(x.value); len+=x.value.length;}
+        var out=new Uint8Array(len), off=0;
+        chunks.forEach(function(c){out.set(c,off);off+=c.length;});
+        return out;
+      }catch(e){
+        clearTimeout(timer);
+        if(attempt===5) throw new Error('part '+i+' failed: '+(e&&e.message));
+        await new Promise(function(r){setTimeout(r, 500*attempt)});
       }
     }
   }
@@ -100,7 +109,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
           done++; show();
         }
       }
-      await Promise.all([worker(),worker(),worker(),worker()]);
+      await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
       var total=buffers.reduce(function(s,a){return s+a.length},0);
       var merged=new Uint8Array(total), off=0;
       buffers.forEach(function(b){merged.set(b,off);off+=b.length});
@@ -108,7 +117,10 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
       var origOpen=XMLHttpRequest.prototype.open;
       XMLHttpRequest.prototype.open=function(m,u){
         if(String(u).indexOf('GrannyPortButBetter.data.unityweb')!==-1) u=blobUrl;
-        return origOpen.call(this,m,u,arguments[2],arguments[3],arguments[4]);
+        // Preserve exact argument count: passing explicit undefined as 3rd arg
+        // makes the request synchronous, which breaks Unity's responseType setter.
+        var rest=Array.prototype.slice.call(arguments,2);
+        return origOpen.apply(this,[m,u].concat(rest));
       };
       hint.textContent='STARTING THE NIGHTMARE…';
       UnityLoader.instantiate('unityContainer','Build/GrannyPortButBetter.json',{onProgress:UnityProgress});
