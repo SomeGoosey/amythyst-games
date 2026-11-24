@@ -3775,8 +3775,10 @@ ${A.stack}
     if (/fliplineads\.com/i.test(u)) {
       return Promise.resolve(new Response(STUB, { status: 200, headers: { 'Content-Type': 'text/xml' } }));
     }
-    // Block every other external request: CORS-blocked ad/tracker calls stall Flash games.
-    if (!/^https:\/\/cdn\.jsdelivr\.net\/gh\/SomeGoosey\/amythyst-games|^blob:|^data:/i.test(u)) {
+    // Block only EXTERNAL http(s) requests (CORS-blocked ads/trackers stall Flash games).
+    // Relative paths, blob: and data: URLs must pass through — Ruffle's inlined WASM is
+    // fetched via a relative URL and handled by the earlier override.
+    if (/^https?:\/\//i.test(u) && !/^https:\/\/cdn\.jsdelivr\.net\/gh\/SomeGoosey\/amythyst-games/i.test(u)) {
       return Promise.resolve(new Response('', { status: 200, headers: { 'Content-Type': 'text/plain' } }));
     }
     return origFetch.apply(this, arguments);
@@ -3786,7 +3788,7 @@ ${A.stack}
     var x = new OrigXHR(), open = x.open;
     x.open = function (m, u) {
       if (String(u).indexOf('fliplineads.com') !== -1) u = 'data:text/xml,' + encodeURIComponent(STUB);
-      else if (!/^https:\/\/cdn\.jsdelivr\.net\/gh\/SomeGoosey\/amythyst-games|^blob:|^data:/i.test(String(u))) u = 'data:text/plain,';
+      else if (/^https?:\/\//i.test(String(u)) && !/^https:\/\/cdn\.jsdelivr\.net\/gh\/SomeGoosey\/amythyst-games/i.test(String(u))) u = 'data:text/plain,';
       return open.call(x, m, u, arguments[2], arguments[3], arguments[4]);
     };
     return x;
