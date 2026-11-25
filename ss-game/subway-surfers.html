@@ -37,8 +37,15 @@
     openExternalLink: function (u) { try { window.open(u, '_blank'); } catch (e) {} },
     generateScreenshot: function () { return resolved(''); }
   };
-  window.PokiSDK = sdk;
-  window.CrazyGames = { SDK: sdk };
+  // Any method not explicitly defined becomes a harmless no-op returning a Promise.
+  var proxied = new Proxy(sdk, {
+    get: function (t, k) {
+      if (k in t) return t[k];
+      return function () { return Promise.resolve(); };
+    }
+  });
+  window.PokiSDK = proxied;
+  window.CrazyGames = { SDK: proxied };
   try { navigator.sendBeacon = function () { return true; }; } catch (e) {}
 })();
 </script>
