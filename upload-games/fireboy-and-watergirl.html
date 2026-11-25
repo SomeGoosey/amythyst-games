@@ -1,13 +1,23 @@
 <!DOCTYPE html> <html class=no-js lang=en><script>
-/* The game bundles h5branding as a requirejs AMD module. Its splash button's
-   inline handler needs a global, which the original ad SDK supplied. Bridge
-   the real module to window so the game's own callback runs on Play. */
-setTimeout(function () {
-  try {
-    require(['h5branding'], function (h) { window.h5branding = h; });
-  } catch (e) {}
-}, 1500);
+/* The original ad SDK is gone. The game JS bundles the same h5branding module
+   as AMD; bridge it to window and auto-advance the splash like in-game zone. */
+(function () {
+  function attempt(n) {
+    if (n > 80) return;
+    try {
+      require(['h5branding'], function (h) {
+        window.h5branding = h;
+        var i = h.SplashLoader.getInstance();
+        i.setLoadProgress = function (a) {
+          if (a >= 100 && this.buttonCallback) this.onPlayButtonClick();
+        };
+      }, function () { setTimeout(function () { attempt(n + 1); }, 250); });
+    } catch (e) { setTimeout(function () { attempt(n + 1); }, 250); }
+  }
+  setTimeout(function () { attempt(0); }, 800);
+})();
 </script>
+<s
 
 <!--
  Page saved with SingleFile 
@@ -81,12 +91,5 @@ setTimeout(function () {
 
 
 
-        addScript('version.js', Date.now(), function() {
-
-
-
-            require(["fireboy-and-watergirl-forest-temple.min.js?v=" + version]);
-
-
-        });
+        require(["fireboy-and-watergirl-forest-temple.min.js?v=tc-285"]);
     </script><script src="data:application/javascript;base64,dmVyc2lvbj0idGMtMjg1IjsKbGlicz1bImh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vQGF6ZXJpb24vcGhhc2VyQDIuNi9idWlsZC9waGFzZXIubWluLmpzIiwiaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9AYXplcmlvbi9waGFzZXItY2FjaGVidXN0ZXJAMi4wL2J1aWxkL3BoYXNlci1jYWNoZWJ1c3Rlci5taW4uanMiLCJodHRwczovL2Nkbi5qc2RlbGl2ci5uZXQvbnBtL0BhemVyaW9uL3BoYXNlci1zcGluZUAzLjAvYnVpbGQvcGhhc2VyLXNwaW5lLm1pbi5qcyIsImh0dHBzOi8vY2RuLmpzZGVsaXZyLm5ldC9ucG0vQGF6ZXJpb24vcGhhc2VyLXN1cGVyLXN0b3JhZ2VAMi4wL2J1aWxkL3BoYXNlci1zdXBlci1zdG9yYWdlLm1pbi5qcyJdOw=="></script>
