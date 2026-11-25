@@ -1,27 +1,14 @@
 <!DOCTYPE html> <html class=no-js lang=en><script>
-/* The original page loads h5branding from a now-dead ad SDK. The game only
-   uses Hosts.isYandex, SplashLoader.getInstance() and Utils.inGDGameZone,
-   so provide a minimal compatible shim. The real game script registers its
-   own buttonCallback via setButtonCallback(); Play just invokes it. */
-window.h5branding = (function () {
-  var inst = {
-    buttonCallback: null,
-    setButtonCallback: function (fn) { this.buttonCallback = fn; },
-    setLoadProgress: function () {},
-    onPlayButtonClick: function () { if (this.buttonCallback) this.buttonCallback(); },
-    destroy: function () {
-      ['h5branding-center', 'h5branding-wrapper'].forEach(function (id) {
-        var e = document.getElementById(id); if (e) e.style.display = 'none';
-      });
-    }
-  };
-  return {
-    Hosts: { isYandex: false },
-    Utils: { inGDGameZone: function () { return true; } },
-    SplashLoader: { getInstance: function () { return inst; } }
-  };
-})();
+/* The game bundles h5branding as a requirejs AMD module. Its splash button's
+   inline handler needs a global, which the original ad SDK supplied. Bridge
+   the real module to window so the game's own callback runs on Play. */
+setTimeout(function () {
+  try {
+    require(['h5branding'], function (h) { window.h5branding = h; });
+  } catch (e) {}
+}, 1500);
 </script>
+
 <!--
  Page saved with SingleFile 
  url: https://topvaz3.github.io/lesson306/lesson-227 
