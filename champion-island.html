@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8"><title>Google Doodle Champion Island</title>
+<style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#0d0a1c;border:0!important;border-radius:0!important;box-shadow:none!important}
+#f{position:absolute;inset:0;width:100%;height:100%;border:0;display:none}
+#l{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;font-family:system-ui,sans-serif;background:radial-gradient(ellipse at 50% 35%,#2a1d55,#0d0a1c 72%)}
+#l .t{font-size:clamp(22px,4vw,52px);font-weight:800;text-align:center;padding:0 12px}
+#l .b{width:min(560px,80vw);height:20px;border:2px solid rgba(255,255,255,.6);border-radius:12px;overflow:hidden;background:rgba(0,0,0,.4)}
+#l .p{height:100%;width:0;background:linear-gradient(90deg,#b9a8ef,#7b5cf0);transition:width .2s}
+#l .s{font-size:clamp(12px,2vw,18px);opacity:.8}</style></head><body>
+<div id="l"><div class="t">Google Doodle Champion Island</div><div class="b"><div class="p" id="p"></div></div><div class="s" id="s">Loading...</div></div>
+<iframe id="f" title="Champion Island" sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms" allow="fullscreen; gamepad; pointer-lock; autoplay"></iframe>
+<script>
+(async function(){
+ var total=74555323, got=0, base="https://cdn.jsdelivr.net/gh/SomeGoosey/amythyst-games@v1.0.125/champion-island/";
+ function fail(e){document.getElementById('s').textContent='Error: '+(e&&e.message||e)}
+ async function one(i){
+  for(var a=1;a<=5;a++){
+   var ctl=new AbortController(), t=setTimeout(function(){ctl.abort()},120000);
+   try{
+    var r=await fetch(base+'part'+i+(a>1?('?retry='+a):''),{signal:ctl.signal,cache:'force-cache'});
+    clearTimeout(t); if(!r.ok) throw new Error('HTTP '+r.status);
+    var rd=r.body.getReader(), cs=[], len=0;
+    for(;;){var x=await rd.read(); if(x.done)break; cs.push(x.value); len+=x.value.length}
+    var out=new Uint8Array(len), off=0; cs.forEach(function(c){out.set(c,off);off+=c.length});
+    got+=len;
+    document.getElementById('p').style.width=(100*got/total)+'%';
+    document.getElementById('s').textContent=Math.round(got/1048576)+' / '+Math.round(total/1048576)+' MB';
+    return out;
+   }catch(e){clearTimeout(t); if(a===5)throw e; await new Promise(function(r){setTimeout(r,500*a)})}
+  }
+ }
+ try{
+  var bufs=await Promise.all([0, 1, 2, 3, 4].map(function(_,i){return one(i)}));
+  var html=''; bufs.forEach(function(b){html+=new TextDecoder('utf-8').decode(b,{stream:true})}); html+=new TextDecoder('utf-8').decode();
+  var f=document.getElementById('f'); f.srcdoc=html;
+  f.onload=function(){document.getElementById('l').style.display='none';f.style.display='block'};
+ }catch(e){fail(e)}
+})();
+</script></body></html>
