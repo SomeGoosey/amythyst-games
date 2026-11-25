@@ -1,4 +1,28 @@
-<!DOCTYPE html> <html class=no-js lang=en><!--
+<!DOCTYPE html> <html class=no-js lang=en><script>
+/* The original page loads h5branding from a now-dead ad SDK. The game only
+   uses Hosts.isYandex, SplashLoader.getInstance() and Utils.inGDGameZone,
+   so provide a minimal compatible shim. The real game script registers its
+   own buttonCallback via setButtonCallback(); Play just invokes it. */
+window.h5branding = (function () {
+  var inst = {
+    buttonCallback: null,
+    setButtonCallback: function (fn) { this.buttonCallback = fn; },
+    setLoadProgress: function () {},
+    onPlayButtonClick: function () { if (this.buttonCallback) this.buttonCallback(); },
+    destroy: function () {
+      ['h5branding-center', 'h5branding-wrapper'].forEach(function (id) {
+        var e = document.getElementById(id); if (e) e.style.display = 'none';
+      });
+    }
+  };
+  return {
+    Hosts: { isYandex: false },
+    Utils: { inGDGameZone: function () { return true; } },
+    SplashLoader: { getInstance: function () { return inst; } }
+  };
+})();
+</script>
+<!--
  Page saved with SingleFile 
  url: https://topvaz3.github.io/lesson306/lesson-227 
  saved date: Tue Nov 24 2026 20:41:39 GMT-0500 (Eastern Standard Time)
