@@ -67,7 +67,7 @@ height:screen.height?screen.height:0,browser:i,browserVersion:s,mobile:l,os:u,os
 "cacheControl": {"default": "must-revalidate"}
 };
 var __totmCfgUrl = URL.createObjectURL(new Blob([JSON.stringify(__totmConfig)],{type:"application/json"}));
-var gameInstance = UnityLoader.instantiate("gameContainer", __totmCfgUrl}, {onProgress: UnityProgress,Module:{onRuntimeInitialized: function() {UnityProgress(gameInstance, "complete")}}});
+var gameInstance = UnityLoader.instantiate("gameContainer", __totmCfgUrl, {onProgress: UnityProgress,Module:{onRuntimeInitialized: function() {UnityProgress(gameInstance, "complete")}}});
     </script><div class="webgl-content">
         <div id="gameContainer" style="width: 100vw; height: 100vh"></div>
         </div>
