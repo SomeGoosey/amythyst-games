@@ -1,4 +1,6 @@
-ble = ! 1;
+arent = this;
+    this.o.setTransform(0, 1, 2.125, 2.125, 0, 0, 0, 0, -7.9);
+    this.o.visible = ! 1;
     this.timeline.addTween(b.Tween.get(this.o).wait(2))
   }).prototype = c = new b.MovieClip;
   c.j = new b.Rectangle(-17, -33, 34, 50.8);
