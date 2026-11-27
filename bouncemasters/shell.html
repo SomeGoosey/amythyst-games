@@ -73,6 +73,12 @@
       };
     }
     clearInterval(timer);
+    // The launcher signals before tearing down this iframe. Fire the game's
+    // own beforeunload save handler so progress is flushed to localStorage.
+    window.addEventListener("message", function (e) {
+      if (!e.data || e.data.type !== "amy-save") return;
+      try { window.dispatchEvent(new Event("beforeunload")); } catch (err) {}
+    });
   }, 100);
 })();</script>
 <script>
